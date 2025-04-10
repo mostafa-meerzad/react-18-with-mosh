@@ -100,3 +100,9 @@ createRoot(document.getElementById("root")!).render(
   </StrictMode>
 );
 ```
+
+## React EcoSystem
+
+Since React is just a library and not a framework like Angular or Vue, and `Libraries` tend to be smaller and focused on specific tasks, while `Frameworks` are larger and provide a more complete infrastructure for application development, we often
+need other tools for concerns such as routing, state management,
+internationalization, form validation, etc.
