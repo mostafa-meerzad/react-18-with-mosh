@@ -40,3 +40,33 @@ Essentially a `React` app is a tree of components with the `APP` being the root,
 5. `package.json`: where all the information about this project is stored, like **name**, **version**, **author**, **dependency packages** for development and production, **scripts** for running specific files/tasks.
 6. `tsconfig.json`: configuration options for `TypeScript Compiler`, we don't need to touch it in most of the times.
 7. `vite.config.ts`: configuration options for `Vite`, we don't need to do anything with it in most cases.
+
+## Create a React Component
+
+There are 2 ways to create a React component:
+
+1. `class components`: old and not used as much these days.
+2. `function components`: new and quite popular. considered best practice.
+
+with `JSX` we can write dynamic content.
+
+```jsx
+// PascalCase
+function Message() {
+  const name = "John";
+
+  // JSX: JavaScript XML
+  // return <h1>Hello World</h1>
+  // we can write any JS statements inside {} "a statement is a piece of code that produces a specific value"
+  //   return <h1>Hello {name}</h1>;
+
+  // or render elements conditionally
+  if (name) return <h1>Hello {name}</h1>;
+  return <h1>Hello World</h1>;
+}
+// export as default
+export default Message;
+// or
+// export as named
+export { Message };
+```
