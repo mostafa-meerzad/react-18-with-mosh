@@ -70,3 +70,33 @@ export default Message;
 // export as named
 export { Message };
 ```
+
+## How React Works
+
+![virtual dom](<./Screenshot%20(160).png>)
+Currently we have a component tree with the `App` component being the `root` or `top level` component and `Message` being the `child` component, when the app start React takes that component tree and builds a JavaScript Data-structure called `Virtual DOM` which is different than the `Browser DOM`,
+
+![component tree](<./Screenshot%20(162).png>)
+
+it is a light-weight in-memory representation of the component tree in which each node represents a component and it's properties, when the `state` or data of a component changes React updated the corresponding node in the `Virtual DOM` to reflect the new changes.
+
+![component tree](<./Screenshot%20(161).png>)
+
+then it compares the current version of `Virtual DOM` with the previous version, to identify the nodes that should be updated, it will then update those nodes in the `Actual DOM`/`Browser DOM`
+
+![component tree](<./Screenshot%20(163).png>)
+
+in fact updating the `Browser DOM` is not done by React itself! but with a dependency package `react-dome`
+
+```tsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.tsx";
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+```
