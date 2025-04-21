@@ -253,3 +253,9 @@ const ListGroup = ({ list, title }: Props) => {
 
 export default ListGroup;
 ```
+
+## Passing Functions via Props
+
+In the real-world applications it's common that something should happen when we select and item, "in our case a city" and the parent component should be notified about it!, we can't implement the logic inside the component itself because the logic varies from application to application or even withing the same application!. so a better way is to pass functions from **parent** to **child** component so whenever the child component is selected the function from parent also gets called.
+
+

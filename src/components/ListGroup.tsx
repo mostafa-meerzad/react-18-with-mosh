@@ -3,8 +3,9 @@ import { useState } from "react";
 interface Props {
   list: string[];
   title: string;
+  onSelectItem: (item: string) => void; // naming-convention "on<EventName>" for eventHandler which is passed through props
 }
-const ListGroup = ({ list, title }: Props) => {
+const ListGroup = ({ list, title, onSelectItem }: Props) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   return (
@@ -14,7 +15,10 @@ const ListGroup = ({ list, title }: Props) => {
         {list.map((item, index) => (
           <li
             key={item}
-            onClick={() => setSelectedIndex(index)}
+            onClick={() => {
+              setSelectedIndex(index);
+              onSelectItem(item);
+            }}
             className={
               selectedIndex === index
                 ? "list-group-item active"
