@@ -258,4 +258,18 @@ export default ListGroup;
 
 In the real-world applications it's common that something should happen when we select and item, "in our case a city" and the parent component should be notified about it!, we can't implement the logic inside the component itself because the logic varies from application to application or even withing the same application!. so a better way is to pass functions from **parent** to **child** component so whenever the child component is selected the function from parent also gets called.
 
+## Props vs State
 
+### Props
+
+1. input passed to a component
+2. similar to function args
+3. immutable "you should treat them as immutable values"
+4. causes a re-render
+
+### State
+
+1. data managed by a component
+2. similar to local variables
+3. mutable "can change anytime"
+4. causes a re-render
