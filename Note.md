@@ -139,3 +139,40 @@ const ListGroup = () => {
 
 export default ListGroup;
 ```
+
+## Stage Management
+
+to change state of components we need to use `useState` hook
+
+```tsx
+const ListGroup = () => {
+  const list = ["item 1", "item 2", "item 3", "item 4"];
+  let selectedIndex = 0;
+  return (
+    <>
+      <h1>List</h1>
+      <ul className="list-group">
+        {list.map((item, index) => (
+          <li
+            key={item}
+            onClick={() => (selectedIndex = index)}
+            className={
+              selectedIndex === index
+                ? "list-group-item active"
+                : "list-group-item "
+            }
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+
+export default ListGroup;
+```
+
+if we define an ordinary variable that variable is local to the component it is defined in, **React** doesn't know about this variable to track it, so we need to tell react that this component is going to have data/state that will change over time
+
+**Note**: each component has it's own state and they're not interfering with one another, even they are the same component but used in several places.
