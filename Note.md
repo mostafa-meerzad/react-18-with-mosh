@@ -110,3 +110,32 @@ internationalization, form validation, etc.
 ## Styling React Components with Bootstrap
 
 first install bootstrap by running `npm i bootstrap@version-number` then remove all the default boilerplate styles from your app then import **bootstrap.css** into your **main.jsx** file
+
+## How to Type Event Handlers
+
+`MouseEvent` type from `React` is the type you need for the **event** parameter for your event-handler functions
+
+```tsx
+import React, { MouseEvent } from "react";
+
+const ListGroup = () => {
+  const list = ["item 1", "item 2", "item 3", "item 4"];
+  const handleClick = (event: MouseEvent) => {
+    console.log(event);
+  };
+  return (
+    <>
+      <h1>List</h1>
+      <ul className="list-group">
+        {list.map((item) => (
+          <li key={item} onClick={handleClick} className="list-group-item">
+            {item}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+
+export default ListGroup;
+```
