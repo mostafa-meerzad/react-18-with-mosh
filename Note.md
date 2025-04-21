@@ -176,3 +176,80 @@ export default ListGroup;
 if we define an ordinary variable that variable is local to the component it is defined in, **React** doesn't know about this variable to track it, so we need to tell react that this component is going to have data/state that will change over time
 
 **Note**: each component has it's own state and they're not interfering with one another, even they are the same component but used in several places.
+
+```tsx
+import { useState } from "react";
+
+const ListGroup = () => {
+  const list = ["item 1", "item 2", "item 3", "item 4"];
+  //   let selectedIndex = 0;
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  // destructure the array that useSate gives and use this naming convention
+
+  //   const arr = useState(-1)
+  // arr[0] // variable like "selectedIndex"
+  // arr[1] // updater function
+
+  return (
+    <>
+      <h1>List</h1>
+      <ul className="list-group">
+        {list.map((item, index) => (
+          <li
+            key={item}
+            onClick={() => setSelectedIndex(index)}
+            className={
+              selectedIndex === index
+                ? "list-group-item active"
+                : "list-group-item "
+            }
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+
+export default ListGroup;
+```
+
+## Passing Data via Props
+
+use Ts `interface` to define the shape of the props for your component.
+
+```tsx
+import { useState } from "react";
+
+interface Props {
+  list: string[];
+  title: string;
+}
+const ListGroup = ({ list, title }: Props) => {
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  return (
+    <>
+      <h1>{title}</h1>
+      <ul className="list-group">
+        {list.map((item, index) => (
+          <li
+            key={item}
+            onClick={() => setSelectedIndex(index)}
+            className={
+              selectedIndex === index
+                ? "list-group-item active"
+                : "list-group-item "
+            }
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+
+export default ListGroup;
+```

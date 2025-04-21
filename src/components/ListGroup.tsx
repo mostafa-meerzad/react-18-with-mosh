@@ -1,18 +1,15 @@
 import { useState } from "react";
 
-const ListGroup = () => {
-  const list = ["item 1", "item 2", "item 3", "item 4"];
-  //   let selectedIndex = 0;
+interface Props {
+  list: string[];
+  title: string;
+}
+const ListGroup = ({ list, title }: Props) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  // destructure the array that useSate gives and use this naming convention
-
-  //   const arr = useState(-1)
-  // arr[0] // variable like "selectedIndex"
-  // arr[1] // updater function
 
   return (
     <>
-      <h1>List</h1>
+      <h1>{title}</h1>
       <ul className="list-group">
         {list.map((item, index) => (
           <li
