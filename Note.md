@@ -106,3 +106,7 @@ createRoot(document.getElementById("root")!).render(
 Since React is just a library and not a framework like Angular or Vue, and `Libraries` tend to be smaller and focused on specific tasks, while `Frameworks` are larger and provide a more complete infrastructure for application development, we often
 need other tools for concerns such as routing, state management,
 internationalization, form validation, etc.
+
+## Styling React Components with Bootstrap
+
+first install bootstrap by running `npm i bootstrap@version-number` then remove all the default boilerplate styles from your app then import **bootstrap.css** into your **main.jsx** file
