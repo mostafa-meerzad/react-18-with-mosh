@@ -458,3 +458,11 @@ function MyComponent() {
   return <Button>Click Me</Button>;
 }
 ```
+
+## Adding Icons
+
+Use `react-icons` library to include icons into your components.
+
+this library gives you icons in the form of react components, so no additional configurations needed.
+
+
