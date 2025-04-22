@@ -1,14 +1,24 @@
-import React from "react";
-import ListGroup from "./components/ListGroup";
+import React, { useState } from "react";
+import Button from "./Button";
 
-const cities = ["London", "New York", "Paris", "Tokyo"];
 const App = () => {
-  const handleSelectItem = (item: string) => {
-    console.log(item);
-  }; // "handle<EventName>"" naming convention for eventHandlers
+  const [isVisible, setIsVisible] = useState(false);
+  let count = 0;
+
+  const handleClick = () => {
+    // react updates state Asynchronously
+    setIsVisible(true);
+    count++;
+
+    // if we check the value of state here we see the old value
+    console.log(isVisible);
+    console.log(count)
+  };
   return (
     <div>
-      <ListGroup list={cities} title="Cities" onSelectItem={handleSelectItem} />
+      <h1>App</h1>
+      <button onClick={handleClick}>show</button>
+      <Button/>
     </div>
   );
 };

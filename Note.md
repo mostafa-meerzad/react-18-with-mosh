@@ -465,4 +465,66 @@ Use `react-icons` library to include icons into your components.
 
 this library gives you icons in the form of react components, so no additional configurations needed.
 
+## Understand State Hook
 
+### React updates state asynchronously not immediately
+
+```tsx
+import React, { useState } from "react";
+
+const App = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const handleClick = () => {
+    // react updates state Asynchronously
+    setIsVisible(true);
+
+    // if we check the value of state here we see the old value
+    console.log(isVisible);
+  };
+  return (
+    <div>
+      <h1>App</h1>
+      <button onClick={handleClick}>show</button>
+    </div>
+  );
+};
+
+export default App;
+```
+
+this is done for performance reasons, if we were calling multiple set functions in an event handler and and react were updating the DOM for each one of them we would end up with an infinite-loop of re-rendering.
+
+for that reason react stores all the state updates somewhere and applies them later when the event-handler finishes execution, then react applies all the state changes and re-renders the component with the updated state.
+
+### State is stored outside of the components
+
+variables declared within a component is local to that component and will be re-declared/re-initialized to the initial value every time the component is re-rendered "because of a state/prop change"
+
+```tsx
+import React from "react";
+
+const Button = () => {
+  const [isVisible, setIsVisible] = React.useState(false);
+  let count = 0; //  this local var will be initialized to 0 every-time the state changes
+  const handleClick = () => {
+    setIsVisible(!isVisible);
+    count++;
+    console.log(count);
+  };
+  return (
+    <button
+      onClick={handleClick}
+      className={isVisible ? "btn btn-primary" : "btn btn-danger"}
+    >
+      Button
+    </button>
+  );
+};
+
+export default Button;
+```
+
+that is why we need to store state in a proper way, the `useState` hook, and the sate value is not stored inside the component itself! and those values will be remove once the component is not visible to the screen.
+
+### Use hooks at the top level of your components
