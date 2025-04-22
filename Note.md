@@ -528,3 +528,77 @@ export default Button;
 that is why we need to store state in a proper way, the `useState` hook, and the sate value is not stored inside the component itself! and those values will be remove once the component is not visible to the screen.
 
 ### Use hooks at the top level of your components
+
+## Choosing the State Structure
+
+1. Avoid redundant state variables.
+2. group related variables inside an object
+3. avoid deeply nested structures.
+
+## Updating State
+
+### Updating Objects
+
+```tsx
+export const Component = () => {
+  const [customer, setCustomer] = useSate({
+    name: "John",
+    address: {
+      city: "San Francisco",
+      zipcode: 94111,
+    },
+  });
+
+  handleClick = () => {
+    // update a nested object
+    // first copy all the properties using "spread operator", then select the address property and again "spread operator" to get all the other properties and select the one you want and update the value
+    setTags({ ...customer, address: { ...customer.address, zipcode: 89111 } });
+  };
+
+  return <div>Component</div>;
+};
+```
+
+### Updating arrays
+
+```tsx
+export const Component = () => {
+  const [tags, setTags] = useSate(["happy", "cheerful"]);
+
+  handleClick = () => {
+    // ADD
+    setTags([...tags, "exciting"]);
+
+    // Remove
+    setTags(tags.filter((tag) => tag !== "happy"));
+
+    // Update
+    setTags(tags.map(tag=>tag === "happy" ? "happiness": tag)
+  };
+
+  return (
+    <div>Component</div>
+  )
+};
+```
+
+### Updating an Array of Objects
+
+```tsx
+export const Component = () => {
+  const [bugs, setBugs] = useSate([
+    {id: 1, title: "bug 1", fixed: false},
+    {id: 2, title: "bug 2", fixed: false},
+    ]);
+
+  handleClick = () => {
+    
+    setBugs(bugs.map(bug=> bug.id === 1 ? {...bug, fixed: true}: bug))
+
+  };
+
+  return (
+    <div>Component</div>
+  )
+};
+```
