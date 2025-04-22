@@ -273,3 +273,188 @@ In the real-world applications it's common that something should happen when we 
 2. similar to local variables
 3. mutable "can change anytime"
 4. causes a re-render
+
+## Styling React Apps
+
+### Vanilla CSS
+
+you can simple create a css files preferably with the same name as your component, then import that file into your component file.
+
+you can also take it to the next level by:
+
+1. create a folder with the same name as your component
+2. put the component itself and the css files inside it
+3. create an index files that import and export the component
+
+```txt
+components/
+  TextInput/
+    TextInput.css
+    TextInput.tsx
+    index.ts
+```
+
+### CSS Modules
+
+CSS Modules is a way to **write CSS that is scoped locally to the component**, rather than globally like traditional CSS. It helps you avoid naming conflicts and keeps styles organized in component-based applications—especially useful in frameworks like **React**, **Next.js**, and others.
+
+---
+
+### 🔧 How CSS Modules Work
+
+When you use a `.module.css` file, the class names you write are automatically transformed into **unique** names during build time. So styles are applied only to the component that imports them.
+
+---
+
+### 🧠 Example:
+
+**styles.module.css**
+
+```css
+.button {
+  background-color: blue;
+  color: white;
+}
+```
+
+**MyComponent.jsx**
+
+```jsx
+import styles from "./styles.module.css";
+
+function MyComponent() {
+  return <button className={styles.button}>Click Me</button>;
+}
+```
+
+**Compiled HTML (behind the scenes):**
+
+```html
+<button class="styles_button__3H1j2">Click Me</button>
+```
+
+- That `styles_button__3H1j2` is a **hashed version** of your class name.
+- It ensures that no other component can accidentally use or override your `.button` class.
+
+---
+
+### ✅ Benefits
+
+- **Scoped styles**: No clashes between components.
+- **Autocompletion** and **type safety** (if using TypeScript).
+- Easier to maintain in large projects.
+
+---
+
+### 📦 Usage in Next.js (already supported out of the box)
+
+Just name your file like `ComponentName.module.css`, import it into your component, and you're good to go.
+
+Let me know if you want to see how this fits into a Next.js page or component.
+
+**Note**:
+you should use **camelNotation** for naming classes like **listGroup** instead of **list-group**.
+
+and in cases you need to apply multiple classes do this:
+
+```tsx
+import styles from "./styles.module.css";
+
+function MyComponent() {
+  return (
+    <button className={[styles.button, styles.glass, styles.shadow].join(" ")}>
+      Click Me
+    </button>
+  );
+}
+```
+
+`className={[styles.button, styles.glass, styles.shadow].join(" ")}`
+
+put them inside an array and join them with a space.
+
+## CSS in Js
+
+Great question! Let's break it down:
+
+---
+
+### 💡 What is **CSS-in-JS**?
+
+**CSS-in-JS** is a styling technique where you **write CSS styles inside your JavaScript (or TypeScript) code**. Instead of keeping styles in `.css` files, you're writing them directly inside components using JavaScript objects or template literals.
+
+---
+
+### 🧪 Example (Styled Components — one of the most popular CSS-in-JS libraries):
+
+```jsx
+import styled from "styled-components";
+
+const Button = styled.button`
+  background-color: blue;
+  color: white;
+  padding: 8px 16px;
+`;
+
+function MyComponent() {
+  return <Button>Click Me</Button>;
+}
+```
+
+✔️ The `Button` here is a React component with styles attached to it.
+
+---
+
+### 🔥 Popular CSS-in-JS Libraries
+
+- **styled-components**
+- **emotion**
+- **@mui/system** (used in Material UI)
+- **Stitches** (used in Radix UI themes)
+- **vanilla-extract**
+
+---
+
+### 🧠 Benefits
+
+- **Scoped styles by default** (like CSS Modules).
+- **Dynamic styling**: You can use props, state, or themes to conditionally style elements.
+- All your **logic + styles are in one file**, which can improve component encapsulation.
+- Works really well with **design systems** and **theming**.
+
+---
+
+### 🆚 CSS Modules vs CSS-in-JS
+
+| Feature         | CSS Modules              | CSS-in-JS                                    |
+| --------------- | ------------------------ | -------------------------------------------- |
+| Style location  | `.module.css` files      | Inside JS/TS files                           |
+| Scoped styles   | ✅ Yes                   | ✅ Yes                                       |
+| Dynamic styles  | 🚫 Limited (via classes) | ✅ Easily with props/state                   |
+| Theming support | 🚫 Manual setup          | ✅ Built-in with many libraries              |
+| Tooling/Setup   | Simple in frameworks     | Requires a library (e.g., styled-components) |
+
+### Passing Props to Styled-Component
+
+```tsx
+import styled from "styled-components";
+
+// define the shape of props for this component
+interface ButtonProps {
+  active: boolean;
+}
+
+// give the component props type to styled-component
+const Button = styled.button<ButtonProps>`
+  background-color: blue;
+  color: white;
+  padding: 8px 16px;
+
+  // use ${(props) => props.propName} to access the prop passed from parent
+  background-color: ${(props) => (props.active ? "blue" : "transparent=8")};
+`;
+
+function MyComponent() {
+  return <Button>Click Me</Button>;
+}
+```
