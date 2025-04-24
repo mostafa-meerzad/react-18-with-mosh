@@ -587,18 +587,296 @@ export const Component = () => {
 ```tsx
 export const Component = () => {
   const [bugs, setBugs] = useSate([
-    {id: 1, title: "bug 1", fixed: false},
-    {id: 2, title: "bug 2", fixed: false},
-    ]);
+    { id: 1, title: "bug 1", fixed: false },
+    { id: 2, title: "bug 2", fixed: false },
+  ]);
 
   handleClick = () => {
-    
-    setBugs(bugs.map(bug=> bug.id === 1 ? {...bug, fixed: true}: bug))
-
+    setBugs(bugs.map((bug) => (bug.id === 1 ? { ...bug, fixed: true } : bug)));
   };
 
-  return (
-    <div>Component</div>
-  )
+  return <div>Component</div>;
 };
 ```
+
+## Handling Forms with React-Hook-Form
+
+### Install react-hook-form
+
+`npm install react-hook-form`
+
+### Import the useForm hook
+
+```tsx
+import React from "react";
+import { useForm } from "react-hook-form";
+
+const Form = () => {
+  // const form = useForm();
+  // let's destructure the object and get the "register" function
+  const { register } = useForm();
+  // we can use register to well register form fields
+
+  console.log(register("name"));
+
+  console.log(form);
+  return <div>Form</div>;
+};
+
+export default Form;
+```
+
+when we call `useForm()` it returns a bunch of methods to programmatically control the form
+
+```txt
+clearErrors
+
+formControl
+
+formState
+
+getFieldState
+
+getValues
+
+handleSubmit
+
+register
+
+reset
+
+resetField
+
+setError
+
+setFocus
+
+```
+
+```tsx
+import React from "react";
+import { useForm } from "react-hook-form";
+
+const Form = () => {
+  // const form = useForm();
+  // destructure the form and get register function
+  // console.log(form);
+  const { register } = useForm();
+  console.log(register("name"));
+  // when we call register it requires a value for the name property for the input field and returns an object {name: "name", onBlur: (e)=>{}, onChange:(e)=>{}, ref: (ref)=>{}}
+  // these properties allow us to programmatically control our form fields, which we can apply them just by destructuring this object into our component, this way all the properties of the register object will be added to our component
+
+  return (
+    <form>
+      <input type="text" {...register("name")} />
+    </form>
+  );
+};
+
+export default Form;
+```
+
+### Apply Form Validations
+
+you can apply field validations as an object passed as the second argument to the `register()` function, somewhat like this `{required: "this field is required!"}` or in a more general way `{criteria: "message to show when it is not met"}`
+the properties for this object must be the standard HTML attributes for data-validation like **required**, **minLength**, **maxLength** and so on...
+
+```tsx
+import { useForm, FieldValues } from "react-hook-form";
+
+export const Form = () => {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = (data: FieldValues) => {
+    console.log(data);
+  };
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input
+        type="text"
+        {...register("name", { required: "name is required!" })}
+      />
+    </form>
+  );
+};
+
+export default Form;
+```
+
+Here are the **valid field validation attributes** you can use when registering input fields with `react-hook-form`'s `register()` function:
+
+---
+
+### ✅ Common `register` Validation Options
+
+You pass them like this:
+
+```tsx
+<input
+  {...register("username", {
+    required: true,
+    minLength: 3,
+    maxLength: 20,
+    pattern: /^[A-Za-z]+$/i,
+    validate: (value) => value !== "admin" || "This username is not allowed",
+  })}
+/>
+```
+
+---
+
+### 🧩 Full List of Built-in Validation Options
+
+| Option                        | Type                                           | Description                                                                   |
+| ----------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------- |
+| `required`                    | `boolean \| string`                            | Makes the field required. You can pass `true` or a custom error message.      |
+| `min`                         | `number \| string`                             | Minimum numeric value. Works with number input.                               |
+| `max`                         | `number \| string`                             | Maximum numeric value.                                                        |
+| `minLength`                   | `number \| string`                             | Minimum string length.                                                        |
+| `maxLength`                   | `number \| string`                             | Maximum string length.                                                        |
+| `pattern`                     | `RegExp \| { value: RegExp, message: string }` | Regex pattern to validate input.                                              |
+| `validate`                    | `Function \| Record<string, Function>`         | Custom validation logic. You can return a string for an error message.        |
+| `valueAsNumber`               | `boolean`                                      | Automatically converts the input value to a number. Useful for number fields. |
+| `valueAsDate`                 | `boolean`                                      | Converts input to a Date object. Useful for date inputs.                      |
+| `setValueAs`                  | `(value) => any`                               | Manually transform input before validation.                                   |
+| `disabled`                    | `boolean`                                      | Will skip validation and submission.                                          |
+| `onChange`, `onBlur`, `value` | React events                                   | Can override default behavior, not commonly used in simple cases.             |
+
+---
+
+### ✨ Cleaner Code Tip
+
+If you find yourself repeating a lot of validations, you can extract them into a schema (e.g. using **Zod**, **Yup**, or **Joi**) and combine with `react-hook-form` using the `resolver`:
+
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const schema = z.object({
+  username: z.string().min(3).max(20),
+  age: z.number().min(18),
+});
+
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm({
+  resolver: zodResolver(schema),
+});
+```
+
+---
+
+### Showing Error Messages
+
+to do so we need to use `formSate` property from `useForm`
+
+Absolutely, let’s dive in 😎 You’re going to love how `react-hook-form` keeps things clean and powerful.
+
+---
+
+## ✅ Showing Error Messages
+
+When a field doesn’t meet its validation rule, the error will be available in `formState.errors`.
+
+Here's a simple example:
+
+```tsx
+import { useForm } from "react-hook-form";
+
+export default function MyForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => console.log(data);
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input
+        {...register("username", { required: "Username is required" })}
+        placeholder="Username"
+      />
+      {errors.username && <p>{errors.username.message}</p>}
+
+      <input
+        type="number"
+        {...register("age", {
+          required: "Age is required",
+          min: { value: 18, message: "You must be at least 18" },
+        })}
+        placeholder="Age"
+      />
+      {errors.age && <p>{errors.age.message}</p>}
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+> ✅ You can show `errors[fieldName]?.message` or use optional chaining:  
+> `errors.username?.message` — this prevents crashes when there's no error.
+>
+> ✅ You can be extremely specific about the error
+> by checking the type of the error which corresponds with the validation criteria you've defined:
+> `errors.username?.type === "required"` or `errors.username?.type === "minLength"` 😎 
+---
+
+## 🧠 `formState` Object Explained
+
+`formState` contains **useful metadata** about the form. Here's a breakdown of the key properties:
+
+| Property             | Type      | Description                                                                          |
+| -------------------- | --------- | ------------------------------------------------------------------------------------ |
+| `errors`             | `object`  | Contains field errors after validation fails.                                        |
+| `isDirty`            | `boolean` | Becomes `true` after any input changes. Useful for showing a "Save changes?" prompt. |
+| `dirtyFields`        | `object`  | Tracks which specific fields were modified.                                          |
+| `isSubmitted`        | `boolean` | Becomes `true` once form has been submitted.                                         |
+| `isSubmitSuccessful` | `boolean` | Becomes `true` if submit passed without errors.                                      |
+| `isSubmitting`       | `boolean` | True while form is in the process of submitting. Great for loading indicators.       |
+| `touchedFields`      | `object`  | Tracks which fields have been touched (focused and blurred).                         |
+| `isValid`            | `boolean` | If all validations pass. Only available if you set `mode: 'onChange'` or `'onBlur'`. |
+| `submitCount`        | `number`  | How many times the form has been submitted.                                          |
+
+---
+
+## 🔥 Use Case Examples
+
+### 💡 Disable Submit Button Until Form is Valid
+
+```tsx
+const {
+  register,
+  handleSubmit,
+  formState: { isValid },
+} = useForm({ mode: "onChange" });
+
+<button disabled={!isValid}>Submit</button>;
+```
+
+### 💡 Show Loading While Submitting
+
+```tsx
+const { isSubmitting } = formState;
+
+<button disabled={isSubmitting}>
+  {isSubmitting ? "Submitting..." : "Submit"}
+</button>;
+```
+
+### 💡 Show “Saved” if User Changed a Field
+
+```tsx
+const { isDirty } = formState;
+
+{
+  isDirty && <p>You have unsaved changes</p>;
+}
+```
+
+---

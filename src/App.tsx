@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Button from "./Button";
+import Form from "./components/Form";
 
 const App = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -16,9 +17,10 @@ const App = () => {
   };
   return (
     <div>
-      <h1>App</h1>
-      <button onClick={handleClick}>show</button>
-      <Button/>
+      {/* <h1>App</h1> */}
+      {/* <button onClick={handleClick}>show</button> */}
+      {/* <Button/> */}
+      <Form/>
     </div>
   );
 };
