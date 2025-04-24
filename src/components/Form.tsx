@@ -1,50 +1,54 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const schema = z.object({
+  email: z.string().min(4).email(),
+  password: z.string().min(3).max(10),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const Form = () => {
-  // const form = useForm();
-  // destructure the form and get register function
-  // console.log(form);
-  const { register, handleSubmit } = useForm();
-  // console.log(register("name"));
-  // when we call register it requires a value for the name property for the input field and returns an object {name: "name", onBlur: (e)=>{}, onChange:(e)=>{}, ref: (ref)=>{}}
-  // these properties allow us to programmatically control our form fields, which we can apply them just by destructuring this object into our component, this way all the properties of the register object will be added to our component
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  const onSubmit = (data: FieldValues) => {
+  const onSubmit = (data: FormData) => {
     console.log(data);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-3">
-        <label htmlFor="exampleInputEmail1" className="form-label">
+        <label htmlFor="email" className="form-label">
           Email address
         </label>
-        <input
-          type="email"
-          className="form-control"
-          // id="exampleInputEmail1"
-          // aria-describedby="emailHelp"
-          {...register("email")}
-        />
+        <input type="email" className="form-control" {...register("email")} />
+
+        {errors.email && (
+          <div className="input-danger">{errors.email?.message}</div>
+        )}
       </div>
       <div className="mb-3">
-        <label htmlFor="exampleInputPassword1" className="form-label">
+        <label htmlFor="password" className="form-label">
           Password
         </label>
         <input
           type="password"
           className="form-control"
-          id="exampleInputPassword1"
+          {...register("password")}
         />
+        {errors.password && <div> {errors.password.message}</div>}
       </div>
       <div className="mb-3 form-check">
         <input
           type="checkbox"
           className="form-check-input"
           id="exampleCheck1"
-          {...register("password")}
-          autoComplete="true"
         />
         <label className="form-check-label" htmlFor="exampleCheck1">
           Check me out
