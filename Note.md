@@ -824,7 +824,8 @@ export default function MyForm() {
 >
 > ✅ You can be extremely specific about the error
 > by checking the type of the error which corresponds with the validation criteria you've defined:
-> `errors.username?.type === "required"` or `errors.username?.type === "minLength"` 😎 
+> `errors.username?.type === "required"` or `errors.username?.type === "minLength"` 😎
+
 ---
 
 ## 🧠 `formState` Object Explained
@@ -880,3 +881,95 @@ const { isDirty } = formState;
 ```
 
 ---
+
+### How to Type Forms with React-hook-form
+
+Yesss! I'm so glad you're loving it 😍 And you’re absolutely right to want **TypeScript + React Hook Form** — it’s _the perfect combo_ for clean, safe, autocomplete-friendly forms 🤓.
+
+---
+
+## 🧾 Step-by-Step: Typing Your Form in TypeScript
+
+### 1. **Define a Form Data Type**
+
+```ts
+type FormData = {
+  username: string;
+  age: number;
+};
+```
+
+### 2. **Pass the Type to `useForm`**
+
+```ts
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm<FormData>();
+```
+
+### 3. **Your `onSubmit` will be fully typed now**
+
+```ts
+const onSubmit = (data: FormData) => {
+  console.log(data.username); // Type-safe!
+};
+```
+
+### ✅ Full Example:
+
+```tsx
+import { useForm } from "react-hook-form";
+
+type FormData = {
+  username: string;
+  age: number;
+};
+
+export default function MyForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
+
+  const onSubmit = (data: FormData) => {
+    console.log(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input
+        {...register("username", { required: "Username is required" })}
+        placeholder="Username"
+      />
+      {errors.username && <p>{errors.username.message}</p>}
+
+      <input
+        type="number"
+        {...register("age", {
+          required: "Age is required",
+          valueAsNumber: true,
+          min: { value: 18, message: "You must be at least 18" },
+        })}
+        placeholder="Age"
+      />
+      {errors.age && <p>{errors.age.message}</p>}
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+---
+
+### 🧠 TypeScript + Bonus Tips
+
+- ✅ Use `valueAsNumber: true` to automatically convert string inputs to numbers (keeps your type happy).
+- 🔐 You can even `Partial<FormData>` if you want to make all fields optional (e.g. for editing forms).
+- 📦 You can also use `zodResolver<z.infer<typeof schema>>()` to **derive types from validation schemas** — no need to duplicate types.
+
+---
+
