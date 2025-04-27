@@ -1135,3 +1135,159 @@ Want to go deeper? I can show you:
 - Reusable schemas & validators
 - Advanced custom refinements
 - Zod + Prisma + RHF for full-stack bliss
+
+## Connecting React app to Backend
+
+### Understand the Effect Hook
+
+Of course! Let's dive deep into the **`useEffect`** hook in React — but I’ll explain it clearly and in layers so you get **both how it works** and **why it exists**.
+
+---
+
+## What is `useEffect`?
+
+In React, **`useEffect`** is a hook that **lets you perform side effects** in function components.  
+**Side effects** are things like:
+
+- Fetching data from an API
+- Subscribing to a data stream (e.g., websockets)
+- Manually changing the DOM
+- Setting a timer
+- Logging something after rendering
+
+Normally, React wants your components to be **pure** — meaning they should just take inputs (props, state) and render output (JSX).  
+But sometimes you **need** to do something extra that touches the outside world.  
+That's where **`useEffect`** comes in.
+
+---
+
+## Basic Syntax
+
+```javascript
+useEffect(() => {
+  // your code here (the side effect)
+}, [dependencies]);
+```
+
+- The first argument is a **function** (your side effect).
+- The second argument is a **dependency array** that tells React **when** to run the side effect.
+
+---
+
+## When does the effect run?
+
+- **After** the component is **rendered** (committed to the DOM).
+- **Whenever** the values in the **dependency array** change.
+
+If you don't provide a dependency array, the effect will **run after every render**.
+
+---
+
+## Examples
+
+### 1. Run **after every render** (no dependency array)
+
+```javascript
+useEffect(() => {
+  console.log("Component rendered or re-rendered!");
+});
+```
+
+- Happens **after every render**.
+
+---
+
+### 2. Run **only once** when the component mounts (empty array)
+
+```javascript
+useEffect(() => {
+  console.log("Component mounted!");
+}, []);
+```
+
+- Happens **only once** (like `componentDidMount` in class components).
+
+---
+
+### 3. Run **only when specific data changes**
+
+```javascript
+const [count, setCount] = useState(0);
+
+useEffect(() => {
+  console.log(`Count changed: ${count}`);
+}, [count]);
+```
+
+- Happens only when `count` changes.
+
+---
+
+### 4. **Cleanup** with `useEffect`
+
+Sometimes you need to **clean up** after your side effect to avoid memory leaks.  
+Example: clearing a timer, unsubscribing from a websocket, etc.
+
+```javascript
+useEffect(() => {
+  const timer = setInterval(() => {
+    console.log("Tick");
+  }, 1000);
+
+  // Return a function to clean up
+  return () => {
+    clearInterval(timer);
+    console.log("Timer cleared");
+  };
+}, []);
+```
+
+- The **return value** inside `useEffect` is a **cleanup function**.
+- It runs:
+  - **When the component unmounts**, or
+  - **Before** the effect runs again (if dependencies change).
+
+---
+
+## Visualize the Lifecycle
+
+| Stage              | When it happens                     |
+| ------------------ | ----------------------------------- |
+| First render       | Run the effect after render         |
+| State/props change | Cleanup old effect → Run new effect |
+| Component unmount  | Cleanup effect                      |
+
+---
+
+## Why is `useEffect` important?
+
+Before hooks, only **class components** could have lifecycle methods like `componentDidMount`, `componentDidUpdate`, and `componentWillUnmount`.  
+Now with `useEffect`, **function components** can also handle these lifecycle events easily — and even combine them together.
+
+---
+
+## Common mistakes to avoid
+
+- Forgetting the dependency array: leads to running the effect **on every render**, possibly causing infinite loops.
+- Wrong dependencies: missing dependencies can cause **stale data bugs**.
+- Putting effects inside conditions: don't put `useEffect` **inside if/else** — always call hooks at the top level.
+
+Example of bad:
+
+```javascript
+if (something) {
+  useEffect(() => {
+    /* don't do this */
+  });
+}
+```
+
+---
+
+## Mini summary in simple words:
+
+> **`useEffect`** tells React: "After you paint the screen, run this code."
+>
+> Also, "If some data changes, maybe run it again or clean up."
+
+---

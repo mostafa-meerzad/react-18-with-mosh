@@ -1,26 +1,17 @@
-import React, { useState } from "react";
-import Button from "./Button";
-import Form from "./components/Form";
+import React, { useEffect, useRef } from "react";
 
 const App = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  let count = 0;
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    document.title = "My App";
+  });
 
-  const handleClick = () => {
-    // react updates state Asynchronously
-    setIsVisible(true);
-    count++;
-
-    // if we check the value of state here we see the old value
-    console.log(isVisible);
-    console.log(count)
-  };
+  useEffect(() => {
+    if (ref.current) ref.current.focus();
+  });
   return (
     <div>
-      {/* <h1>App</h1> */}
-      {/* <button onClick={handleClick}>show</button> */}
-      {/* <Button/> */}
-      <Form/>
+      <input type="text" className="form-control" ref={ref} />
     </div>
   );
 };
