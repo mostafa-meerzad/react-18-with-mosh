@@ -1291,3 +1291,381 @@ if (something) {
 > Also, "If some data changes, maybe run it again or clean up."
 
 ---
+
+### Making the Request
+
+Haha I love that reaction! 😍  
+I'm guessing you want to see the **real-world examples** too? Let’s roll — here are some super useful ones:
+
+---
+
+## 1. Fetching API Data with `useEffect`
+
+This is **probably the most common** use.
+
+```javascript
+import { useState, useEffect } from "react";
+
+function UsersList() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      const res = await fetch("https://jsonplaceholder.typicode.com/users");
+      const data = await res.json();
+      setUsers(data);
+    }
+
+    fetchUsers();
+  }, []); // Only once when component mounts
+
+  return (
+    <div>
+      <h1>Users:</h1>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**What's happening?**
+
+- The fetch happens **once** when the component mounts.
+- When data arrives, we update the `users` state → triggers a re-render with the data.
+
+---
+
+## 2. Handling Window Resize
+
+Imagine you want to **update the UI** when the browser window resizes.
+
+```javascript
+import { useState, useEffect } from "react";
+
+function WindowSize() {
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    function handleResize() {
+      setWidth(window.innerWidth);
+    }
+
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup: remove the event listener
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []); // Attach once
+
+  return <h1>Window width: {width}px</h1>;
+}
+```
+
+**What's happening?**
+
+- We listen to the window resize event.
+- Every time the window resizes, we update state.
+- **Important:** we clean up the event listener when the component unmounts (or else memory leak!!).
+
+---
+
+## 3. Animating a Timer
+
+Suppose you want a timer that ticks every second.
+
+```javascript
+import { useState, useEffect } from "react";
+
+function Timer() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds((prev) => prev + 1);
+    }, 1000);
+
+    // Cleanup when component unmounts
+    return () => clearInterval(interval);
+  }, []);
+
+  return <h1>Timer: {seconds}s</h1>;
+}
+```
+
+---
+
+## Bonus: Dependency array tips
+
+| Dependency array          | Effect Runs                   |
+| ------------------------- | ----------------------------- |
+| No array                  | After **every render**        |
+| `[]` empty array          | After **only initial render** |
+| `[someVar]` specific deps | After **someVar changes**     |
+
+👉 If you mess up the dependency array, you can cause **weird bugs** like stale data, infinite loops, etc.
+
+---
+
+Bro this is just the surface —  
+`useEffect` is **so powerful** once you get the hang of it! 🚀
+
+---
+
+### How to Abort an HTTP request
+
+Ohhh you’re asking **such a good and important question**! 🔥  
+This is getting into **pro-level** thinking about building **safe, efficient** React apps.  
+Let’s go deep into it **but keep it super clear**:
+
+---
+
+## Why do we need to **abort** HTTP requests?
+
+When you make a fetch request inside a `useEffect`, **what if**:
+
+- The user navigates away _before_ the fetch finishes?
+- Or the component _unmounts_ while the request is still running?
+
+👉 Then the request is **still ongoing** in the background!
+
+**Problem:**  
+When the fetch eventually finishes, your app might try to:
+
+- Update a component that's already gone.
+- Cause **memory leaks** or **React warnings** like:
+  > "Can't perform a React state update on an unmounted component."
+
+---
+
+## **Solution:** use an `AbortController` 🚀
+
+An **`AbortController`** is a browser API that:
+
+- Lets you **cancel** a fetch request **in the middle**.
+- It gives you a **signal** you can pass to `fetch`.
+- Later you can call `.abort()` to actually **cancel** the request.
+
+---
+
+## How it looks (full example)
+
+```javascript
+import { useState, useEffect } from "react";
+
+function UsersList() {
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController(); // create controller
+    const signal = controller.signal; // get signal
+
+    async function fetchUsers() {
+      try {
+        const res = await fetch("https://jsonplaceholder.typicode.com/users", {
+          signal,
+        });
+        if (!res.ok) throw new Error("Network response was not ok");
+        const data = await res.json();
+        setUsers(data);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          console.log("Fetch aborted");
+        } else {
+          setError(err.message);
+        }
+      }
+    }
+
+    fetchUsers();
+
+    return () => {
+      controller.abort(); // 🔥 Abort the fetch when the component unmounts
+    };
+  }, []);
+
+  if (error) return <p>Error: {error}</p>;
+
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+---
+
+## How the flow works:
+
+1. `AbortController` is created.
+2. Its `.signal` is passed to the `fetch` call.
+3. If the component unmounts (user navigates away, etc.), React runs the cleanup function.
+4. Cleanup function calls `controller.abort()`.
+5. Fetch **gets canceled**, and no state update happens anymore.
+
+---
+
+## Why is using AbortController considered **best practice**?
+
+✅ **Avoid memory leaks:**  
+If you don't abort, the app holds on to unnecessary memory (the fetch response, etc.)
+
+✅ **Prevent setting state on unmounted components:**  
+That avoids weird React errors and wasted CPU cycles.
+
+✅ **Save network bandwidth:**  
+The browser actually **stops** downloading data if you abort — great for slow connections!
+
+✅ **Cleaner app behavior:**  
+If the user leaves the page quickly, you don't process data they don't need anymore.
+
+✅ **Future-proof:**  
+Modern apps should handle **cancellations** correctly, especially when APIs get bigger and UIs become more dynamic.
+
+---
+
+## Quick Notes:
+
+- `AbortController` is supported in all modern browsers (but **not IE11** — who cares anymore honestly 😅).
+- If you abort a fetch, `fetch` throws an `AbortError`.
+- You must **catch** it carefully and recognize it’s an "ok" situation (not a bug).
+
+---
+
+## In simple words:
+
+> `AbortController` is like giving yourself a "red button" 💣 to stop a fetch if you don't need it anymore.
+
+Without it, you just sit and wait even when the user has already moved on.
+
+---
+
+**Perfect**, you're leveling up 🔥 — let's switch gears to **Axios** + **TypeScript**.
+
+---
+
+# 🛑 How to Abort Axios Requests (with TypeScript)
+
+Axios **doesn't use** `AbortController` natively (at least before v1.4).  
+Instead, **the modern Axios versions** (v1.4 and later) **support** `AbortController` directly!
+
+In older versions, Axios had its own `CancelToken` API (now **deprecated**).
+
+✅ **Best practice today**:  
+👉 Use the **browser's native `AbortController`** with Axios!
+
+---
+
+# Full Example: Axios + AbortController + TypeScript
+
+```tsx
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+function UsersList() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController(); // ✅ create a controller
+
+    async function fetchUsers() {
+      try {
+        const res = await axios.get<User[]>(
+          "https://jsonplaceholder.typicode.com/users",
+          {
+            signal: controller.signal, // ✅ attach signal
+          }
+        );
+        setUsers(res.data);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          if (err.code === "ERR_CANCELED") {
+            console.log("Request canceled");
+          } else {
+            setError(err.message);
+          }
+        } else {
+          setError("An unknown error occurred");
+        }
+      }
+    }
+
+    fetchUsers();
+
+    return () => {
+      controller.abort(); // ✅ cancel the request if component unmounts
+    };
+  }, []);
+
+  if (error) return <p>Error: {error}</p>;
+
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>
+          {user.name} - {user.email}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default UsersList;
+```
+
+---
+
+# ✨ What's happening?
+
+- We create an **`AbortController`** instance.
+- Pass `controller.signal` inside the Axios `get` call options.
+- Axios will listen to that signal — and if `.abort()` is called, Axios throws a special **cancel error**.
+- We check `err.code === 'ERR_CANCELED'` to know it's an **intentional abort** (not a server error).
+
+---
+
+# ⚡ Quick Important Details
+
+| Feature           | How it behaves                                                    |
+| :---------------- | :---------------------------------------------------------------- |
+| TypeScript types  | Axios makes it easy to type the response (`axios.get<User[]>`)    |
+| Aborting          | Throws a special cancel error you can catch separately            |
+| Error Handling    | Always check with `axios.isAxiosError(err)` first                 |
+| Old `CancelToken` | **Deprecated** — don't use anymore. Use `AbortController` instead |
+
+---
+
+# Bonus Tip 🚀
+
+If you want to **retry** the request if it was canceled (for example if user comes back), you can catch the abort, and refetch manually!
+
+---
+
+# 📚 Summary
+
+- Axios now **supports** `AbortController` properly.
+- **Always** abort ongoing HTTP requests inside `useEffect` cleanup.
+- In TypeScript, **type** your response data properly (`User[]` in the example).
+- Check for `axios.isAxiosError` and `err.code === 'ERR_CANCELED'` to safely handle cancellations.
+
+---
+
+> In simple words:  
+> **Using AbortController with Axios + TypeScript = clean, safe, professional-grade apps.** 🚀
+
+---
